@@ -1,0 +1,30 @@
+{
+  "name": "login-signup-profile",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@types/bcrypt": "^3.0.0",
+    "bcrypt": "^4.0.1",
+    "dotenv": "^8.2.0",
+    "isomorphic-unfetch": "^3.0.0",
+    "mongoose": "^5.9.7",
+    "next": "9.3.4",
+    "next-connect": "^0.6.1",
+    "passport": "^0.4.1",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "react-use-auth": "^0.5.3",
+    "swr": "^0.2.0"
+  },
+  "devDependencies": {
+    "@types/mongoose": "^5.7.10",
+    "@types/node": "^13.11.0",
+    "@types/react": "^16.9.32",
+    "typescript": "^3.8.3"
+  }
+}
