@@ -1,0 +1,1 @@
+export default process.env.NODE_ENV === 'development' ? process.env.DEVELOPMENT_ENV_BASE_URL : process.env.PRODUCTION_ENV_BASE_URL

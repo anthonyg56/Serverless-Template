@@ -1,54 +1,66 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { NextPage } from "next"
 import Head from "next/head"
 import Link from "next/link"
-// import { useRouter } from "next/router"
+import { useRouter } from "next/router"
 import fetch from "isomorphic-unfetch"
-import { ILoginForm } from '../../interfaces'
+import { IHandleSubmit, IHandleInput, LoginForm } from '../../interfaces/forms'
+import { saveToken } from '../../utils/withAuth'
+import BaseUrl from '../../utils/baseUrl'
 
-type HandleSubmit = (e: React.FormEvent<HTMLFormElement>) => void
-type SubmitForm = (body: ILoginForm) => Promise<void>
-
+const LoginFormInitalState = {
+  email: '',
+  password: ''
+}
 
 const LoginPage: NextPage = () => {
-  // const router = useRouter()
-  const [errorMsg, setErrorMsg] = useState<string>("")
+  const router = useRouter()
+  const [userName, setUserName] = useState('')
+  const [errorMsg, setErrorMsg] = useState<string>('')
+  const [userInfo, setUserInfo] = useState<LoginForm>(LoginFormInitalState)
+  const [redirect, setRedirect] = useState(false)
 
   // Transforms submitted data into a useable object
-  // TODO: add state values for all inputs so they clear on submit
-  const handleSubmit: HandleSubmit = (e) => {
+  const handleEmailInput: IHandleInput = (e) => {
     e.preventDefault()
-
-    // Body object that will be sent to submitForm
-    const form: ILoginForm = {
-      email: e.currentTarget.email.value,
-      password: e.currentTarget.password.value
-    }
-
-    submitForm(form)
+    setUserInfo({ ...userInfo, email: e.target.value })
+  }
+  const handlePasswordInput: IHandleInput = (e) => {
+    e.preventDefault()
+    setUserInfo({ ...userInfo, password: e.target.value })
   }
 
-
   // Makes contact with the server & database by submitting a POST req
-  const submitForm: SubmitForm = async(body) => {
-    // Response object after making a request
-    const res = await fetch(`${process.env.BASE_URL}/api/login`, {
+  const handleSubmit: IHandleSubmit = async(e) => {
+    e.preventDefault()
+
+    const res = await fetch(`${BaseUrl}/api/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify(userInfo)
     })
 
     // TODO: Add some error handling
-    if (res.status === 500) {
-      setErrorMsg(res.statusText)
+    if (res.status >= 400) {
+      setErrorMsg('There was an error')
       return
     }
 
-    console.log('sucessfuly loged in')
-    console.log(res)
+    const { user, refreshToken, accessToken } = await res.json()
+
+    saveToken(null, refreshToken, 'refresh')
+    saveToken(null, accessToken, 'access')
+  
+    setUserName(user.userName)
+    setRedirect(true)
   }
+
+  // If redirect is true, redirect to users homepage
+  useEffect(() => {
+    if (redirect === true) router.push('/[userName]', `/${userName}`)
+  }, [redirect])
 
   return (
     <>
@@ -69,6 +81,8 @@ const LoginPage: NextPage = () => {
                     name="required"
                     id="email"
                     placeholder="eg example@gmail.com"
+                    value={userInfo.email}
+                    onChange={handleEmailInput}
                     required
                   />
                 </label>
@@ -80,6 +94,8 @@ const LoginPage: NextPage = () => {
                     type="password"
                     name="password"
                     id="password"
+                    value={userInfo.password}
+                    onChange={handlePasswordInput}
                     required
                   />
                 </label>
@@ -89,7 +105,7 @@ const LoginPage: NextPage = () => {
           </form>
           <div className="register">
             <h3>
-              Register for an account <Link href="/register">here</Link>
+              Register for an account <Link href="/register"><a>here</a></Link>
             </h3>
           </div>
         </div>

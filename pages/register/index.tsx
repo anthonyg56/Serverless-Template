@@ -2,41 +2,50 @@ import React, { useState } from "react"
 import { NextPage } from "next"
 import Head from "next/head"
 import { useRouter } from "next/router"
-import { IRegisterForm } from '../../interfaces'
+import { IHandleSubmit, IHandleInput, RegisterForm } from '../../interfaces/forms'
+import BaseUrl from '../../utils/baseUrl'
 
-type HandleSubmit = (e: React.FormEvent<HTMLFormElement>) => void
-type SubmitForm = (body: IRegisterForm) => Promise<void>
-
-
+const initalState = {
+    email: '',
+    password: '',
+    userName: '',
+    name: ''
+}
 
 const RegisterPage: NextPage = () => {
     const [errorMsg, setErrorMsg] = useState<string>("")
+    const [userInfo, setUserInfo] = useState<RegisterForm>(initalState)
+
     const router = useRouter()
 
-    // Transforms submitted data into a useable object
-    // TODO: add state values for all inputs so they clear on submit
-    const handleSubmit: HandleSubmit = (e) => {
+    // Updates userInfo properties on input change evennt
+    const handleEmailInput: IHandleInput = (e) => {
         e.preventDefault()
-
-        // Body object that will be sent to submitForm
-        const formValues: IRegisterForm = {
-            accountName: e.currentTarget.accountName.value,
-            userName: e.currentTarget.userName.value,
-            email: e.currentTarget.email.value,
-            password: e.currentTarget.password.value
-        }
-
-        submitForm(formValues)
+        setUserInfo({ ...userInfo, email: e.target.value })
+    }
+    const handlePasswordInput: IHandleInput = (e) => {
+        e.preventDefault()
+        setUserInfo({ ...userInfo, password: e.target.value })
+    }
+    const handleUserNameInput: IHandleInput = (e) => {
+        e.preventDefault()
+        setUserInfo({ ...userInfo, userName: e.target.value })
+    }
+    const handleNameInput: IHandleInput = (e) => {
+        e.preventDefault()
+        setUserInfo({ ...userInfo, name: e.target.value })
     }
 
-    const submitForm: SubmitForm = async (body) => {
-        // Response object after making a request
-        const res = await fetch(`${process.env.BASE_URL}/api/register`, {
+    // Handles form submit ever
+    const handleSubmit: IHandleSubmit = async (e) => {
+        e.preventDefault()
+
+        const res = await fetch(`${BaseUrl}/api/register`, {
             method: "POST",
             headers: {
             "Content-Type": "application/json"
             },
-            body: JSON.stringify(body)
+            body: JSON.stringify(userInfo)
         })
     
         // TODO: Add some better error handling
@@ -59,12 +68,14 @@ const RegisterPage: NextPage = () => {
                     <form className="register-form form" onSubmit={handleSubmit}>
                         {errorMsg ? <p style={{ color: "red" }}>{errorMsg}</p> : null}
                         <div className="register-input-label">
-                            <label htmlFor="accountName">
+                            <label htmlFor="name">
                                 Name
                                 <input 
                                     type="text"
-                                    name="accountName"
-                                    id="accountName"
+                                    name="name"
+                                    id="name"
+                                    value={userInfo.name}
+                                    onChange={handleNameInput}
                                     required
                                 />
                             </label>
@@ -76,6 +87,8 @@ const RegisterPage: NextPage = () => {
                                     type="text"
                                     name="userName"
                                     id="userName"
+                                    value={userInfo.userName}
+                                    onChange={handleUserNameInput}
                                     required
                                 />
                             </label>
@@ -83,13 +96,27 @@ const RegisterPage: NextPage = () => {
                         <div className="register-input-label">
                             <label htmlFor="email">
                                 Email Adress
-                                <input type="email" name="email" id="email" required/>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    id="email"
+                                    value={userInfo.email}
+                                    onChange={handleEmailInput}
+                                    required
+                                />
                             </label>
                         </div>
                         <div className="register-input-label">
                             <label htmlFor="password">
                                 Password
-                                <input type="password" name="password" id="password" required/>
+                                <input
+                                    type="password"
+                                    name="password"
+                                    id="password"
+                                    value={userInfo.password}
+                                    onChange={handlePasswordInput}
+                                    required
+                                />
                             </label>
                         </div>
                         <button type="submit">Create Account</button>

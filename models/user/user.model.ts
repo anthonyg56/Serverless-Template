@@ -1,11 +1,37 @@
-import mongoose from 'mongoose'
+import mongoose, { Model, Connection, Schema } from 'mongoose'
 import bcrypt from 'bcrypt'
-
-import UserSchema from './user.schema'
-
-import { IUser } from '../../interfaces'
-
+import { IUser } from '../../interfaces/models'
 const SALT_WORK_FACTOR = 10
+
+const schemaName = 'User'
+const UserSchema: Schema<IUser> = new Schema<IUser>({
+    name: {
+        type: String,
+        required: true
+    },
+    userName: {
+        type: String,
+        required: true,
+        index: {
+            unique: true
+        }
+    },
+    email: {
+        type: String,
+        required: true,
+        index: {
+            unique: true
+        }
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    refreshTokensId: {
+        type: mongoose.Types.ObjectId,
+        ref: 'RefreshTokens'
+    }
+})
 
 // Hash password
 UserSchema.pre<IUser>('save', function(next) {
@@ -32,6 +58,7 @@ UserSchema.pre<IUser>('save', function(next) {
     })
 })
 
-const User = mongoose.model<IUser>('User') || mongoose.model<IUser>('User', UserSchema)
+// const User = mongoose.model<IUser>('User') || mongoose.model<IUser>('User', UserSchema)
+const UserModel = (con: Connection): Model<IUser> => con.model<IUser>(schemaName, UserSchema)
 
-export default User
+export default UserModel
