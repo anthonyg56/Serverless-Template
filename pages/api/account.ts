@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import UserModel from '../../src/models/user/user.model'
+import UserModel from '../../src/models/user.model'
 import { getConnection } from '../../src/utils/dbConnection'
 import { verify } from 'jsonwebtoken'
 

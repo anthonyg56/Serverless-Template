@@ -3,9 +3,9 @@ import { Model } from 'mongoose'
 import bcrypt from 'bcrypt'
 import { createAccessToken, createRefreshToken } from '../../src/utils/auth'
 import { getConnection } from '../../src/utils/dbConnection'
-import UserModel from '../../src/models/user/user.model'
-import RefreshTokensModel from '../../src/models/tokens/refreshToken.schema'
-import { IRefreshTokens, IUser } from '../../src/interfaces/models'
+import UserModelConn from '../../src/models/user.model'
+import RefreshTokensModel from '../../src/models/refreshToken.schema'
+import { IRefreshTokens, UserModel } from '../../src/interfaces/models'
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     const {
@@ -13,15 +13,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         password
     } = req.body
 
-    // Get database connect & create model
     const dbConn = await getConnection()
-    const User: Model<IUser> = UserModel(dbConn)
+    const User: Model<UserModel> = UserModelConn(dbConn)
 
-    // Get user from database
     const user = await User.findOne({ email: email })
     if (!user) return res.status(422).json({ message: 'Account not found' })
 
-    // Validate password
     const isPassword = await bcrypt.compare(password, user.password)
         .then((isMatch: boolean) => {
             isMatch ? () => {
@@ -42,7 +39,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         refreshTokensId
     } = user
 
-    // RefreshToken Handling
     const RefreshTokens: Model<IRefreshTokens> = await RefreshTokensModel(dbConn)
     const refreshTokens = await RefreshTokens.findById(refreshTokensId, (err, token) => {
         if (err) throw err
@@ -51,7 +47,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     if (!refreshTokens) return res.status(422).json({ message: 'No refresh tokens available' })
 
-    // Create tokens
     const accessToken = createAccessToken(_id)
     const refreshToken = createRefreshToken(_id, userName, email)
 

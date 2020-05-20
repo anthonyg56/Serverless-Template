@@ -1,5 +1,5 @@
 import { Connection, Model, Schema } from 'mongoose'
-import { IRefreshTokens } from '../../interfaces/models'
+import { IRefreshTokens } from '../interfaces/models'
 
 const schemaName = 'RefreshTokens'
 const RefreshTokensSchema: Schema<IRefreshTokens> = new Schema<IRefreshTokens>({

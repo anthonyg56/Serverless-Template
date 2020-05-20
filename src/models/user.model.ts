@@ -1,10 +1,10 @@
 import mongoose, { Model, Connection, Schema } from 'mongoose'
 import bcrypt from 'bcrypt'
-import { IUser } from '../../interfaces/models'
+import { UserModel } from '../interfaces/models'
 const SALT_WORK_FACTOR = 10
 
 const schemaName = 'User'
-const UserSchema: Schema<IUser> = new Schema<IUser>({
+const UserSchema: Schema<UserModel> = new Schema<UserModel>({
     name: {
         type: String,
         required: true
@@ -34,7 +34,7 @@ const UserSchema: Schema<IUser> = new Schema<IUser>({
 })
 
 // Hash password
-UserSchema.pre<IUser>('save', function(next) {
+UserSchema.pre<UserModel>('save', function(next) {
     const user = this
     // Only hash the password if it has been modified (or is new)
     if (!user.isModified('password')) {
@@ -59,6 +59,6 @@ UserSchema.pre<IUser>('save', function(next) {
 })
 
 // const User = mongoose.model<IUser>('User') || mongoose.model<IUser>('User', UserSchema)
-const UserModel = (con: Connection): Model<IUser> => con.model<IUser>(schemaName, UserSchema)
+const UserModelConn = (con: Connection): Model<UserModel> => con.model<UserModel>(schemaName, UserSchema)
 
-export default UserModel
+export default UserModelConn

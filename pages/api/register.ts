@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import UserModel from '../../src/models/user/user.model'
-import RefreshTokensModel from '../../src/models/tokens/refreshToken.schema'
+import UserModel from '../../src/models/user.model'
+import RefreshTokensModel from '../../src/models/refreshToken.schema'
 import { getConnection } from '../../src/utils/dbConnection'
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
