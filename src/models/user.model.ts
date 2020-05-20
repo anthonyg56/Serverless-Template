@@ -58,7 +58,6 @@ UserSchema.pre<UserModel>('save', function(next) {
     })
 })
 
-// const User = mongoose.model<IUser>('User') || mongoose.model<IUser>('User', UserSchema)
 const UserModelConn = (con: Connection): Model<UserModel> => con.model<UserModel>(schemaName, UserSchema)
 
 export default UserModelConn
