@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import UserModel from '../../models/user/user.model'
-import { getConnection } from '../../utils/withDb'
+import UserModel from '../../src/models/user/user.model'
+import { getConnection } from '../../src/utils/dbConnection'
 import { verify } from 'jsonwebtoken'
 
 const getUser = async (req: NextApiRequest, res: NextApiResponse) => {

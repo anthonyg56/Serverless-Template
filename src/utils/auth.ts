@@ -1,4 +1,4 @@
-import BaseUrl from '../utils/baseUrl'
+import BaseUrl from './baseUrl'
 import fetch from 'isomorphic-unfetch'
 import { parseCookies, setCookie } from 'nookies'
 import { IGetAccessToken } from '../interfaces/utils'

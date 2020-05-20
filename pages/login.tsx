@@ -3,64 +3,47 @@ import { NextPage } from "next"
 import Head from "next/head"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import fetch from "isomorphic-unfetch"
-import { IHandleSubmit, IHandleInput, LoginForm } from '../../interfaces/forms'
-import { saveToken } from '../../utils/withAuth'
-import BaseUrl from '../../utils/baseUrl'
+import { Login } from "../src/utils/apiHelpers"
+import { HandleSubmit, HandleInput, DefaultUser } from '../src/interfaces/forms'
+import { saveToken } from '../src/utils/auth'
 
-const LoginFormInitalState = {
+const defaultUser: DefaultUser = {
   email: '',
   password: ''
 }
 
 const LoginPage: NextPage = () => {
-  const router = useRouter()
-  const [userName, setUserName] = useState('')
   const [errorMsg, setErrorMsg] = useState<string>('')
-  const [userInfo, setUserInfo] = useState<LoginForm>(LoginFormInitalState)
+  const [user, setUser] = useState<DefaultUser>(defaultUser)
   const [redirect, setRedirect] = useState(false)
+  const router = useRouter()
 
-  // Transforms submitted data into a useable object
-  const handleEmailInput: IHandleInput = (e) => {
-    e.preventDefault()
-    setUserInfo({ ...userInfo, email: e.target.value })
+  let slug = ''
+
+  useEffect(() => {
+    if (redirect === true) router.push('/[userName]', `/${slug}`)
+  }, [redirect])
+
+  const handleInput: HandleInput = (prop, value) => {
+    setUser({ ...user, [prop]: value });
   }
-  const handlePasswordInput: IHandleInput = (e) => {
-    e.preventDefault()
-    setUserInfo({ ...userInfo, password: e.target.value })
-  }
 
-  // Makes contact with the server & database by submitting a POST req
-  const handleSubmit: IHandleSubmit = async(e) => {
+  const handleSubmit: HandleSubmit = async(e) => {
     e.preventDefault()
 
-    const res = await fetch(`${BaseUrl}/api/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(userInfo)
-    })
-
-    // TODO: Add some error handling
-    if (res.status >= 400) {
+    const response = await Login(user)
+    if (response.status !== 200) {
       setErrorMsg('There was an error')
       return
     }
 
-    const { user, refreshToken, accessToken } = await res.json()
+    const { userdata, refreshToken, accessToken } = await response.json()
+    slug = userdata.username
 
     saveToken(null, refreshToken, 'refresh')
     saveToken(null, accessToken, 'access')
-  
-    setUserName(user.userName)
     setRedirect(true)
   }
-
-  // If redirect is true, redirect to users homepage
-  useEffect(() => {
-    if (redirect === true) router.push('/[userName]', `/${userName}`)
-  }, [redirect])
 
   return (
     <>
@@ -81,8 +64,12 @@ const LoginPage: NextPage = () => {
                     name="required"
                     id="email"
                     placeholder="eg example@gmail.com"
-                    value={userInfo.email}
-                    onChange={handleEmailInput}
+                    value={user.email || ""}
+                    onChange={e => {
+                      e.preventDefault();
+                      const value = e.currentTarget.value;
+                      handleInput("email", value);
+                    }}
                     required
                   />
                 </label>
@@ -94,8 +81,12 @@ const LoginPage: NextPage = () => {
                     type="password"
                     name="password"
                     id="password"
-                    value={userInfo.password}
-                    onChange={handlePasswordInput}
+                    value={user.password || ""}
+                    onChange={e => {
+                      e.preventDefault();
+                      const value = e.currentTarget.value;
+                      handleInput("password", value);
+                    }}
                     required
                   />
                 </label>

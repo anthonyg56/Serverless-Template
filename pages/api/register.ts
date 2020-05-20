@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import UserModel from '../../models/user/user.model'
-import RefreshTokensModel from '../../models/tokens/refreshToken.schema'
-import { getConnection } from '../../utils/withDb'
+import UserModel from '../../src/models/user/user.model'
+import RefreshTokensModel from '../../src/models/tokens/refreshToken.schema'
+import { getConnection } from '../../src/utils/dbConnection'
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     const {

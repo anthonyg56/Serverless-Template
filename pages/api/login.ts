@@ -1,11 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { Model } from 'mongoose'
 import bcrypt from 'bcrypt'
-import { createAccessToken, createRefreshToken } from '../../utils/withAuth'
-import { getConnection } from '../../utils/withDb'
-import UserModel from '../../models/user/user.model'
-import RefreshTokensModel from '../../models/tokens/refreshToken.schema'
-import { IRefreshTokens, IUser } from '../../interfaces/models'
+import { createAccessToken, createRefreshToken } from '../../src/utils/auth'
+import { getConnection } from '../../src/utils/dbConnection'
+import UserModel from '../../src/models/user/user.model'
+import RefreshTokensModel from '../../src/models/tokens/refreshToken.schema'
+import { IRefreshTokens, IUser } from '../../src/interfaces/models'
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     const {
